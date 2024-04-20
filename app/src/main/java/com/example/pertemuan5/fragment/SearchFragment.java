@@ -63,20 +63,16 @@ public class SearchFragment extends Fragment {
                 return false;
             }
 
+
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Set progressBar menjadi VISIBLE saat pencarian dimulai
                 progressBar.setVisibility(View.VISIBLE);
-                instagramList.clear();
-                adapter.notifyDataSetChanged();
 
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 Handler handler = new Handler(Looper.getMainLooper());
                 executor.execute(() -> {
                     ArrayList<Instagram> filteredList = new ArrayList<>();
-                    if (newText.isEmpty()) {
-                        filteredList.clear();
-                    } else {
+                    if (!newText.isEmpty()) {
                         for (Instagram item : DataSource.instagrams) {
                             if (item.getUsername().toLowerCase().contains(newText.toLowerCase()) ||
                                     item.getName().toLowerCase().contains(newText.toLowerCase())) {
@@ -91,12 +87,16 @@ public class SearchFragment extends Fragment {
                     }
                     handler.post(() -> {
                         progressBar.setVisibility(View.GONE);
-                        instagramList.addAll(filteredList);
+                        instagramList.clear();
+                        if (!newText.isEmpty()) {
+                            instagramList.addAll(filteredList);
+                        }
                         adapter.notifyDataSetChanged();
                     });
                 });
                 return true;
             }
+
 
         });
 
